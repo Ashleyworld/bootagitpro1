@@ -23,7 +23,12 @@ public class UserController {
 
     @GetMapping("/")
     public String home() {
-        return "view/form";
+        return "view/home";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "";
     }
 
     @PostMapping("/register")
