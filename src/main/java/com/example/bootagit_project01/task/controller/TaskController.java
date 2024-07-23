@@ -4,10 +4,7 @@ import com.example.bootagit_project01.task.dto.TaskDto;
 import com.example.bootagit_project01.task.entity.Task;
 import com.example.bootagit_project01.task.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
