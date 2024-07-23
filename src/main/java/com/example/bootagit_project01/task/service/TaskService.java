@@ -7,7 +7,6 @@ import com.example.bootagit_project01.task.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -33,4 +32,14 @@ public class TaskService {
     }
 
 
+    public Task DeleteTask(TaskDto taskDto){
+        Task task = Task.builder()
+                .title(taskDto.getTitle())
+                .description(taskDto.getDescription())
+                .status(taskDto.getStatus())
+                .build();
+
+        taskRepository.delete(task);
+        return task;
+    }
 }
