@@ -18,9 +18,10 @@ public class Task {
     private String title;
     private String description;
     private String status;
+//    private String user_id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user_id;
     // getters and setters
 }
