@@ -16,7 +16,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     /**
-     * 모든  작업을 조회하는 메서드
+     * 모든 작업을 조회하는 메서드
      *
      * @return 작업 DTO 리스트
      */

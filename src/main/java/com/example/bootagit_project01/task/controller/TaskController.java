@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 작업  관련 REST API를 제공하는 컨트롤러
+ * 작업 관련 REST API를 제공하는 컨트롤러
  */
 @RestController
 @RequestMapping("/tasks")
