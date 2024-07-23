@@ -3,11 +3,10 @@ package com.example.bootagit_project01.task.controller;
 import com.example.bootagit_project01.task.dto.TaskDto;
 import com.example.bootagit_project01.task.entity.Task;
 import com.example.bootagit_project01.task.service.TaskService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -33,21 +32,23 @@ public class TaskController {
     }
 
     @PostMapping("/add")
-    public String AddTask(TaskDto taskDto) {
-        Task addedTask = taskService.AddTask(taskDto);
+    public String addTask(@RequestBody TaskDto taskDto, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "User not authenticated";
+        }
+        taskDto.setUserId(userId);  // 세션에서 가져온 userId를 TaskDto에 설정
 
+        taskService.AddTask(taskDto);
 
-        return "ResponseEntity.ok(tasks)";
+        return "Task added successfully";
     }
 
-    @PostMapping("/delete")
-    public String deleteTask(TaskDto taskDto, RedirectAttributes redirectAttributes) {
-        Task deletedTask = taskService.DeleteTask(taskDto);
+    @DeleteMapping("/delete/{taskid}")
+    public String deleteTask(@PathVariable("taskid") Long taskid) {
+        taskService.DeleteTask(taskid);
 
-        // 리다이렉트 시 메시지를 전달합니다.
-        redirectAttributes.addFlashAttribute("message", "Task deleted successfully with ID: " + deletedTask.getId());
-
-        return "redirect:/list";
+        return "ResponseEntity.ok(tasks)";
     }
 
 

@@ -10,7 +10,10 @@
 <p th:text="${message}"></p> <!-- 성공 메시지 표시 -->
 <ul>
     <li th:each="task : ${tasks}">
-        <span th:text="${task.name}"></span> -
+        <span th:text="${task.id}"></span>
+        <span th:text="${task.title}"></span>
+        <span th:text="${task.status}"></span>
+        <span th:text="${task.user_id}"></span>
         <span th:text="${task.description}"></span>
     </li>
 </ul>

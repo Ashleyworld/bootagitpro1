@@ -23,6 +23,7 @@ public class TaskService {
 
     public Task AddTask(TaskDto taskDto){
         Task task = Task.builder()
+                .id(taskDto.getId())
                 .title(taskDto.getTitle())
                 .description(taskDto.getDescription())
                 .status(taskDto.getStatus())
@@ -32,14 +33,11 @@ public class TaskService {
     }
 
 
-    public Task DeleteTask(TaskDto taskDto){
-        Task task = Task.builder()
-                .title(taskDto.getTitle())
-                .description(taskDto.getDescription())
-                .status(taskDto.getStatus())
-                .build();
+    public Task DeleteTask(Long taskId){
+        // id 로 task 객체를 조회
+        Task task = taskRepository.findById(taskId);
+        .orElseThrow(() -> new RuntimeException("task 에 해당하는 아이디를 찾을 수 없습니다."+taskId));
 
         taskRepository.delete(task);
-        return task;
     }
 }
