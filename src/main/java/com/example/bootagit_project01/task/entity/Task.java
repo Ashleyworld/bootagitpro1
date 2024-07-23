@@ -17,14 +17,14 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long taskid;
-    private Long id;
+    private Long taskid;
     private String title;
     private String description;
     private String status;
 //    private String user_id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user_id;
+    @JoinColumn(name = "userid")
+    private User userid;
     // getters and setters
 }

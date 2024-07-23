@@ -1,11 +1,15 @@
 package com.example.bootagit_project01.task.controller;
 
 import com.example.bootagit_project01.task.dto.TaskDto;
+import com.example.bootagit_project01.task.entity.Task;
+import com.example.bootagit_project01.task.repository.TaskRepository;
 import com.example.bootagit_project01.task.service.TaskService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,18 +21,22 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
+    private ModelMapper mapper;
+    @Autowired
+    private TaskRepository taskRepository;
 
     /**
      * 모든 작업을 조회하는 API
      *
      * @return 작업 DTO 리스트를 담은 ResponseEntity
      */
-    @GetMapping
-    public ResponseEntity<List<TaskDto>> getAllTasks() {
-        // 작업 서비스를 통해 모든 작업 조회
-        List<TaskDto> tasks = taskService.getAllTasks();
-        // 조회된 작업 리스트를 ResponseEntity에 담아 반환
-        return ResponseEntity.ok(tasks);
+    public List<TaskDto> getAllTasks(TaskDto taskDto) {
+        // 모든 작업 엔티티를 조회
+        List<Task> tasks = taskRepository.findAll();
+        // 작업 엔티티를 작업 DTO로 변환하여 리스트로 반환
+        return tasks.stream()
+                .map(this::taskdto)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -37,12 +45,12 @@ public class TaskController {
      * @param taskDto 생성할 작업 DTO
      * @return 생성된 작업 DTO를 담은 ResponseEntity
      */
-    @PostMapping
-    public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto) {
-        // 작업 서비스를 통해 새로운 작업 생성
-        TaskDto createdTask = taskService.createTask(taskDto);
-        // 생성된 작업 DTO를 ResponseEntity에 담아 반환
-        return ResponseEntity.ok(createdTask);
+    @PostMapping("/create")
+    public ResponseEntity<TaskDto> addTask(@RequestBody TaskDto taskDto) {
+
+        TaskDto savedTaskDto = taskService.createTask(taskDto);
+        ResponseEntity<TaskDto> task = new ResponseEntity<>(savedTaskDto, HttpStatus.CREATED);
+        return task;
     }
 
     /**
@@ -52,7 +60,7 @@ public class TaskController {
      * @param taskDto 업데이트할 작업 정보를 담은 DTO
      * @return 업데이트된 작업 DTO를 담은 ResponseEntity
      */
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<TaskDto> updateTask(@PathVariable Long id, @RequestBody TaskDto taskDto) {
         // 작업 서비스를 통해 작업 업데이트
         TaskDto updatedTask = taskService.updateTask(id, taskDto);
@@ -66,7 +74,7 @@ public class TaskController {
      * @param id 삭제할 작업의 ID
      * @return 빈 ResponseEntity (HTTP 상태 코드 204)
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         // 작업 서비스를 통해 작업 삭제
         taskService.deleteTask(id);
