@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -31,9 +31,9 @@ public class UserController {
         return "";
     }
 
-    @PostMapping("/register")
+    @PostMapping("/join")
     public ResponseEntity<String> registerUser(@RequestBody UserDto userDto) {
-        userService.registerUser(userDto);
+        userService.joinUser(userDto);
         return ResponseEntity.ok("User registered successfully");
 
     }

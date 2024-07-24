@@ -1,14 +1,14 @@
 package com.example.bootagit_project01.user.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserDto {
+    @Setter(AccessLevel.NONE)
     private Long userid;
     private String username;
     private String password;
