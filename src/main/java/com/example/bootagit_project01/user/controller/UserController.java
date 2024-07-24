@@ -9,16 +9,19 @@ package com.example.bootagit_project01.user.controller;
 * */
 
 import com.example.bootagit_project01.user.dto.UserDto;
+import com.example.bootagit_project01.user.entity.User;
 import com.example.bootagit_project01.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
+    @Autowired //의존관계를 주입:외부에서 주입
     private UserService userService;
 
     @GetMapping("/")
@@ -26,16 +29,37 @@ public class UserController {
         return "view/home";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "";
+
+    @GetMapping("/userlist")
+    public ResponseEntity<List<UserDto>> getUserList() {
+        //  모든 유저 조회
+
+        List<UserDto> users = userService.getAllUser();
+        return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/join")
-    public ResponseEntity<String> registerUser(@RequestBody UserDto userDto) {
-        userService.joinUser(userDto);
-        return ResponseEntity.ok("User registered successfully");
 
+    @GetMapping("/new")
+    public String createUser()
+    {
+        return "user";
+    }
+
+    @PostMapping("/new")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto){
+
+        UserDto createdUser = userService.joinUser(userDto);
+
+        return ResponseEntity.ok(createdUser);
+    }
+
+    @DeleteMapping("delete/{userid}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userid){
+
+        userService.deleteUser(userid);
+
+        return ResponseEntity.noContent().build();
+        // 빈 ResponseEntity와 함께 http 상태코드 204 (no content) 반환
     }
 
 }

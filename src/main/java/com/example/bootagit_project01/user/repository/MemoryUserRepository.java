@@ -1,9 +1,11 @@
 package com.example.bootagit_project01.user.repository;
 
 import com.example.bootagit_project01.user.entity.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class MemoryUserRepository implements UserRepository{
 
     private static Map<Long, User> store = new HashMap<>();
@@ -49,6 +51,14 @@ public class MemoryUserRepository implements UserRepository{
         // 위에 store라는 맵에 user가 담겨있지만
         // 반환 타입이 list이므로 arraylist로 반환
     }
+
+
+    @Override
+    public Optional<User> deleteById(Long userid) {
+        return Optional.ofNullable(store.get(userid));
+        // null 이 여도 store에서 진행한다
+    }
+
 
     public void clearStore() {
         store.clear();
