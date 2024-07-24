@@ -31,9 +31,9 @@ public class TaskService {
         return modelMapper.map(savedTask, TaskDto.class);
     }
 
-    public TaskDto updateTask(Long id, TaskDto taskDto) {
-        Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디에 할일을 찾을 수 없어용: " + id));
+    public TaskDto updateTask(Long taskid, TaskDto taskDto) {
+        Task existingTask = taskRepository.findById(taskid)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디에 할일을 찾을 수 없어요: " + taskid));
 
         modelMapper.map(taskDto, existingTask);
 
@@ -41,9 +41,9 @@ public class TaskService {
         return modelMapper.map(updatedTask, TaskDto.class);
     }
 
-    public void deleteTask(Long id) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디에 할일을 찾을 수 없어용: " + id));
+    public void deleteTask(Long taskid) {
+        Task task = taskRepository.findById(taskid)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디에 할일을 찾을 수 없어요: " + taskid));
 
         taskRepository.delete(task);
     }

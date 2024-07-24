@@ -19,7 +19,5 @@ public class TaskDto {
     private UserDto user;
 
 
-    public void setUserId(Long userId) {
-    }
 }
 
