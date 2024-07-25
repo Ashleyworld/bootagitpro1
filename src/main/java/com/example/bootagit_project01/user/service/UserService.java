@@ -102,11 +102,12 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
+    // 회원 삭제
     public void deleteUser(Long userid){
         User user = userRepository.findById(userid)
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디가 없습니다."));
 
-        userRepository.deleteById(user.getUserid());
+        userRepository.deleteById(user);
     }
 
 
@@ -117,5 +118,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public UserDto updateUser(Long userid, UserDto userDto){
+        User existingUser = userRepository.findById(userid)
+                .orElseThrow(() -> new RuntimeException("해당하는 아이디를 찾을 수 없습니다."));
 
+        modelMapper.map(userDto, existingUser);
+
+        User updatedUser = userRepository.save(existingUser);
+        return modelMapper.map(updatedUser, UserDto.class);
+    }
 }

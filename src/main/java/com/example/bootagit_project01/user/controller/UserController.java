@@ -11,12 +11,14 @@ package com.example.bootagit_project01.user.controller;
 import com.example.bootagit_project01.user.dto.UserDto;
 import com.example.bootagit_project01.user.entity.User;
 import com.example.bootagit_project01.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -61,5 +63,15 @@ public class UserController {
         return ResponseEntity.noContent().build();
         // 빈 ResponseEntity와 함께 http 상태코드 204 (no content) 반환
     }
+
+    @PostMapping("update/{userid}")
+    public  ResponseEntity<UserDto> updateUser(@PathVariable Long userid, @RequestBody UserDto userDto){
+
+        UserDto updatedUser = userService.updateUser(userid, userDto);
+
+        return ResponseEntity.ok(updatedUser);
+
+    }
+
 
 }

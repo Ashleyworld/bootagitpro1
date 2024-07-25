@@ -52,12 +52,17 @@ public class MemoryUserRepository implements UserRepository{
         // 반환 타입이 list이므로 arraylist로 반환
     }
 
-
     @Override
-    public Optional<User> deleteById(Long userid) {
-        return Optional.ofNullable(store.get(userid));
-        // null 이 여도 store에서 진행한다
+    public Optional<User> deleteById(User user) {
+        return Optional.ofNullable(store.remove(user.getUserid()));
     }
+
+
+//    @Override
+//    public Optional<User> deleteById(Long userid) {
+//        return Optional.ofNullable(store.get(userid));
+//        // null 이 여도 store에서 진행한다
+//    }
 
 
     public void clearStore() {

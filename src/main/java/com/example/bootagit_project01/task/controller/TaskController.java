@@ -57,7 +57,8 @@ public class TaskController {
      * @return 업데이트된 작업 DTO를 담은 ResponseEntity
      */
     @PutMapping("/{taskid}")
-    public ResponseEntity<TaskDto> updateTask(@PathVariable Long taskid, @RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskDto> updateTask(
+            @PathVariable Long taskid, @RequestBody TaskDto taskDto) {
         // 작업 서비스를 통해 작업 업데이트
         TaskDto updatedTask = taskService.updateTask(taskid, taskDto);
         // 업데이트된 작업 DTO를 ResponseEntity에 담아 반환

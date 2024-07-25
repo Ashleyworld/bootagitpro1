@@ -13,5 +13,5 @@ public interface UserRepository {
     Optional<User> findById(Long userid);
     Optional<User> findByName(String username);
     List<User> findAll();
-    Optional<User> deleteById(Long userid);
+    Optional<User> deleteById(User user);
 }
