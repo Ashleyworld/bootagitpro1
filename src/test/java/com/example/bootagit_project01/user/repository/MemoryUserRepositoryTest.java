@@ -1,7 +1,8 @@
 package com.example.bootagit_project01.user.repository;
 
 
-import com.example.bootagit_project01.user.entity.User;
+import com.example.bootagit_project01.user.user.entity.User;
+import com.example.bootagit_project01.user.user.repository.MemoryUserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

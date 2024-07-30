@@ -1,6 +1,6 @@
-package com.example.bootagit_project01.user.repository;
+package com.example.bootagit_project01.user.user.repository;
 
-import com.example.bootagit_project01.user.entity.User;
+import com.example.bootagit_project01.user.user.entity.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package com.example.bootagit_project01.user.controller;
+package com.example.bootagit_project01.user.user.controller;
 /*
 * Spring Framework에서 제공하는 어노테이션으로, 주로 RESTful 웹 서비스를 구현할 때 사용됩니다.
 *  RESTful 웹 서비스는 HTTP 프로토콜을 사용하여 클라이언트와 서버 간의 상호 작용을 정의
@@ -8,9 +8,8 @@ package com.example.bootagit_project01.user.controller;
 * 이는 RESTful 웹 서비스에서 JSON 또는 XML 형식의 응답을 쉽게 반환
 * */
 
-import com.example.bootagit_project01.user.dto.UserDto;
-import com.example.bootagit_project01.user.entity.User;
-import com.example.bootagit_project01.user.service.UserService;
+import com.example.bootagit_project01.user.user.dto.UserDto;
+import com.example.bootagit_project01.user.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

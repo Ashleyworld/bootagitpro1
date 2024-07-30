@@ -1,15 +1,13 @@
 package com.example.bootagit_project01.user.service;
 
-import com.example.bootagit_project01.user.entity.User;
-import com.example.bootagit_project01.user.repository.MemoryUserRepository;
-import com.example.bootagit_project01.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
+import com.example.bootagit_project01.user.user.entity.User;
+import com.example.bootagit_project01.user.user.repository.MemoryUserRepository;
+import com.example.bootagit_project01.user.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
 

@@ -1,16 +1,18 @@
-package com.example.bootagit_project01.user.service;
+package com.example.bootagit_project01.user.user.service;
 
-import com.example.bootagit_project01.user.dto.UserDto;
-import com.example.bootagit_project01.user.entity.User;
-import com.example.bootagit_project01.user.repository.UserRepository;
+import com.example.bootagit_project01.user.user.dto.UserDto;
+import com.example.bootagit_project01.user.user.entity.User;
+import com.example.bootagit_project01.user.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional // JPA 가 Join 들어올때 모든 데이터변경이 트랜잭션 안에서 실행됨
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -31,45 +33,14 @@ public class UserService {
 //        return userRepository.save(user);
 //    }
 
-    // 회원가입
-//    public UserDto joinUser(UserDto userDto) {
-//        // 같은 이름이 있는 중복 회원x
-//        // 코드안에 Optional 이 들어간게 예쁘지 않음으로
-////            Optional<User> result = userRepository.findByName(user.getUsername());
-////            result.ifPresent(u -> {
-//
-//        //Optional 안에 내장 메서드 ifPresent() 만약에 값이 있으면->
-//        // 값을 그냥 꺼내는 것 보다 위의 예외처리 권장/ or문 권장(orElseThrow)
-//        User user = new User();
-//        user.setUsername(userDto.getUsername());
-//        user.setPassword(userDto.getPassword());
-//        user.setEmail(userDto.getEmail());
-//
-//        validateDuplicateUser(user);    // 중복 회원 검증
-//
-////        User savedUser = userRepository.save(user);
-////        return savedUser.getUserid();
-//
-//        // 사용자 저장
-//        User savedUser = userRepository.save(user);
-//
-//        // 저장된 사용자 정보를 UserDto로 직접 변환하여 반환
-//        UserDto responseDto = new UserDto();
-//        responseDto.setUsername(savedUser.getUsername());
-//        responseDto.setPassword(savedUser.getPassword());
-//        responseDto.setEmail(savedUser.getEmail());
-//
-//        return responseDto;
-//
-//    }
-
 
     public UserDto joinUser(UserDto userDto) {
         // UserDto를 User 객체로 변환
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
-        user.setEmail(userDto.getEmail());
+        User user = User.builder()
+                .username(userDto.getUsername())
+                .password(userDto.getPassword())
+                .email(userDto.getEmail())
+        .build();
 
         // 중복 회원 검증
         validateDuplicateUser(user);
@@ -82,7 +53,13 @@ public class UserService {
         userDto.setUsername(savedUser.getUsername());
         userDto.setPassword(savedUser.getPassword());
         userDto.setEmail(savedUser.getEmail());
-        return userDto;
+        return UserDto.builder()
+                .userid(savedUser.getUserid())
+                .username(savedUser.getUsername())
+                .password(savedUser.getPassword())
+                .email(savedUser.getEmail())
+                .build();
+
     }
 
 
@@ -94,16 +71,16 @@ public class UserService {
     }
 
     /*전체 회원 조회*/
-    public List<User> findUsers(){
+    public List<User> findUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> findOne(Long userId){
+    public Optional<User> findOne(Long userId) {
         return userRepository.findById(userId);
     }
 
     // 회원 삭제
-    public void deleteUser(Long userid){
+    public void deleteUser(Long userid) {
         User user = userRepository.findById(userid)
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디가 없습니다."));
 
@@ -118,7 +95,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserDto updateUser(Long userid, UserDto userDto){
+    public UserDto updateUser(Long userid, UserDto userDto) {
         User existingUser = userRepository.findById(userid)
                 .orElseThrow(() -> new RuntimeException("해당하는 아이디를 찾을 수 없습니다."));
 

@@ -1,7 +1,6 @@
 package com.example.bootagit_project01.task.dto;
 
-import com.example.bootagit_project01.user.dto.UserDto;
-import com.example.bootagit_project01.user.entity.User;
+import com.example.bootagit_project01.user.user.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

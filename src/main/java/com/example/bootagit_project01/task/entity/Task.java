@@ -1,7 +1,7 @@
 package com.example.bootagit_project01.task.entity;
 
 
-import com.example.bootagit_project01.user.entity.User;
+import com.example.bootagit_project01.user.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
