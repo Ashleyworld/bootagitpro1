@@ -1,0 +1,447 @@
+자세한 일 프로세스 설명
+1. 프로젝트 설계 및 환경 설정 (1시간)
+1.1 아이디어 공유 및 요구사항 정리 (30분)
+아이디어 공유: 프로젝트의 비전과 목표를 팀원들과 공유합니다.
+목표: 사용자가 할 일을 관리할 수 있는 애플리케이션을 개발하는 것.
+주요 기능:
+회원가입 및 로그인 기능
+할 일 추가, 수정, 삭제, 조회 기능
+할 일의 우선순위 설정 및 완료 상태 관리
+알림 기능 (선택 사항)
+요구사항 정리:
+필수 기능:
+회원가입 및 로그인: 사용자 인증 및 권한 관리
+할 일 관리: 할 일 추가, 수정, 삭제, 조회
+부가 기능:
+할 일 우선순위 설정
+알림 기능
+1.2 개발 환경 설정 (30분)
+프로젝트 초기화: 프로젝트를 초기화하고 GitHub 리포지토리를 생성합니다.
+Spring Boot와 React를 초기 설정합니다.
+개발 환경 설정:
+IDE 설정: IntelliJ, VSCode 등 각자 선호하는 IDE를 설정합니다.
+필요한 라이브러리 설치: Gradle, npm 등을 사용하여 필요한 라이브러리를 설치합니다.
+Git 연결 및 브랜치 전략 설정: GitHub 리포지토리를 설정하고 브랜치 전략을 수립합니다.
+2. 데이터베이스 설계 및 구현 (1시간)
+2.1 사용자와 할 일 테이블 설계 및 생성 (30분)
+DB 스키마 설계: 사용자(User) 테이블과 할 일(Task) 테이블을 설계합니다.
+
+User 테이블: id, username, password, email
+Task 테이블: id, title, description, status, user_id
+DB 생성 스크립트 작성:
+
+CREATE TABLE User (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Task (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(50),
+    user_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES User(id)
+);
+2.2 JPA 엔티티 클래스 및 리포지토리 구현 (30분)
+JPA 엔티티 클래스 작성:
+
+@Entity
+public class User {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String username;
+    private String password;
+    private String email;
+    // getters and setters
+}
+
+@Entity
+public class Task {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String title;
+    private String description;
+    private String status;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    // getters and setters
+}
+리포지토리 작성:
+
+public interface UserRepository extends JpaRepository<User, Long> {}
+public interface TaskRepository extends JpaRepository<Task, Long> {}
+3. 회원 관리 및 인증 기능 구현 (1시간 30분)
+3.1 회원 가입 및 로그인 API 구현 (45분)
+회원 가입 API:
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
+        userService.saveUser(user);
+        return ResponseEntity.ok("User registered successfully.");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+        String token = userService.authenticate(loginRequest);
+        if (token != null) {
+            return ResponseEntity.ok(token);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
+        }
+    }
+}
+3.2 JWT 기반 인증 미들웨어 구현 (45분)
+JWT 토큰 생성 및 검증:
+
+@Component
+public class JwtUtil {
+
+    private String SECRET_KEY = "secret";
+
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, userDetails.getUsername());
+    }
+
+    private String createToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+    }
+
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+    }
+
+    private Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+}
+미들웨어 작성:
+
+@Component
+public class JwtRequestFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        String username = null;
+        String jwt = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
+            username = jwtUtil.extractUsername(jwt);
+        }
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+            if (jwtUtil.validateToken(jwt, userDetails)) {
+
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                usernamePasswordAuthenticationToken
+                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            }
+        }
+        chain.doFilter(request, response);
+    }
+}
+4. 할 일 관리 기능 구현 (2시간)
+4.1 할 일 CRUD API 구현 (1시간)
+할 일 추가 API:
+
+@RestController
+@RequestMapping("/api/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskService taskService;
+
+    @PostMapping
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        Task createdTask = taskService.saveTask(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
+        Task updatedTask = taskService.updateTask(id, task);
+        return ResponseEntity.ok(updatedTask);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.ok("Task deleted successfully.");
+    }
+}
+4.2 할 일 목록 조회 API 구현 (페이징, 필터링, 정렬) (1시간)
+할 일 목록 조회 API:
+
+@GetMapping
+public ResponseEntity<Page<Task>> getAllTasks(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "id") String sortBy) {
+    Page<Task> tasks = taskService.getAllTasks(page, size, sortBy);
+    return ResponseEntity.ok(tasks);
+}
+5. 예외 처리 및 테스트 (1시간)
+5.1 예외 처리 및 유효성 검사 로직 추가 (30분)
+예외 처리:
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> handleValidationException(ValidationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+}
+유효성 검사:
+
+@Entity
+public class User {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @Size(min = 3, message = "Username should have at least 3 characters")
+    private String username;
+
+    @NotNull
+    @Size(min = 6, message = "Password should have at least 6 characters")
+    private String password;
+
+    @NotNull
+    @Email(message = "Email should be valid")
+    private String email;
+
+    // getters and setters
+}
+5.2 Postman을 활용한 API 테스트 및 버그 찾기 (30분)
+Postman 테스트:
+
+회원 가입: POST /api/users/register
+로그인: POST /api/users/login
+할 일 추가: POST /api/tasks
+할 일 수정: PUT /api/tasks/{id}
+할 일 삭제: DELETE /api/tasks/{id}
+할 일 조회: GET /api/tasks
+버그 찾기: 테스트 중 발견된 버그를 수정합니다.
+
+6. 배포 준비 및 문서화 (1시간 30분)
+6.1 Docker 이미지 생성 및 Docker Compose 파일 작성 (30분)
+Docker 이미지 생성:
+
+Dockerfile 작성:
+
+FROM openjdk:11-jre-slim
+COPY target/myapp.jar myapp.jar
+ENTRYPOINT ["java", "-jar", "myapp.jar"]
+docker build -t myapp:latest .
+
+Docker Compose 파일 작성:
+
+version: '3'
+services:
+  app:
+    image: myapp:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+    ports:
+      - "3306:3306"
+6.2 Kubernetes 설정 파일 작성 (1시간)
+Kubernetes 배포 파일 작성:
+
+deployment.yaml 작성:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://myapp-db:3306/mydb
+        - name: SPRING_DATASOURCE_USERNAME
+          value: root
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: root
+service.yaml 작성:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+db-deployment.yaml 작성:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp-db
+  template:
+    metadata:
+      labels:
+        app: myapp-db
+    spec:
+      containers:
+      - name: myapp-db
+        image: mariadb:latest
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: root
+        - name: MYSQL_DATABASE
+          value: mydb
+db-service.yaml 작성:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-db
+spec:
+  selector:
+    app: myapp-db
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP
+Kubectl을 사용하여 배포:
+
+kubectl apply -f db-deployment.yaml
+kubectl apply -f db-service.yaml
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+6.3 API 문서 작성 및 코드 리뷰 (30분)
+API 문서 작성: Swagger 또는 다른 문서화 도구를 사용하여 API 문서를 작성합니다.
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.example"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+}
+코드 리뷰: 팀장이 전체 코드를 리뷰하고 피드백을 제공합니다.
+
+7. 회고 및 후속 계획 (30분)
+7.1 프로젝트 회고 (20분)
+잘된 점: 프로젝트 진행 중 잘된 점을 공유합니다.
+개선점: 개선이 필요한 부분을 논의합니다.
+7.2 다음 계획 및 일정 조율 (10분)
+후속 계획: 다음 프로젝트 또는 추가 기능 구현 계획을 세웁니다.
+일정 조율: 다음 작업의 일정과 책임자를 조율합니다.
+🎨 기술 스택 설명 🎨
+1. 백엔드 (BE)
+Java 11: 안정성과 성능이 검증된 프로그래밍 언어.
+Spring Boot 2.5.x: 빠른 개발을 위한 프레임워크.
+Spring Data JPA: 데이터베이스 접근을 간편하게 해주는 라이브러리.
+Spring Security: 인증과 권한 관리를 위한 프레임워크.
+JWT: JSON Web Token을 사용한 인증 방식.
+Gradle 7.x: 빌드 자동화 도구.
+JUnit 5 & Mockito: 단위 테스트와 목(mock) 객체 생성을 위한 도구.
+2. 데이터베이스 (DB)
+MariaDB 10.5.x: 오픈소스 RDBMS, MySQL과 호환.
+H2 Database: 테스트용 인메모리 데이터베이스.
+3. 프론트엔드 (FE)
+React 17.x: 사용자 인터페이스를 구축하기 위한 라이브러리.
+React Router 6.x: SPA(Single Page Application) 내 라우팅을 위한 라이브러리.
+Axios: HTTP 요청을 위한 라이브러리.
+Styled Components: 컴포넌트 스타일링을 위한 라이브러리.
+Recoil: 상태 관리를 위한 라이브러리.
+Jest & React Testing Library: 프론트엔드 테스트를 위한 도구.
+4. 협업 도구
+Git & GitHub: 버전 관리와 협업을 위한 도구.
+Slack: 실시간 커뮤니케이션을 위한 도구.
+5. 배포 도구
+Docker: 애플리케이션의 컨테이너화를 위한 도구.
+Kubernetes: 컨테이너화된 애플리케이션의 오케스트레이션을 위한 도구.
+선택한 기술 스택을 통해 투두리스트 프로젝트를 성공적으로 완성해봅시다! 화이팅! 💪
