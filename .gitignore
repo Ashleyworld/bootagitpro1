@@ -1,4 +1,4 @@
-information.md
+READ.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

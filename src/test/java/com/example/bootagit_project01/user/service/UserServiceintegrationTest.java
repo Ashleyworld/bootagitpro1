@@ -43,20 +43,21 @@ public class UserServiceintegrationTest {
 //        User findUser = userService.findOne(saveId).get();
         // 윗줄 때문에 생략해도 됨.
 
-        assertThat(userDto.getUsername()).isEqualTo(findUsers());
+        assertThat(userDto.getUsername())
+                .isEqualTo(userService.findUserName(userDto.getUsername()));
     }
 
-    @Test
-    String findUsersByname() {
-        // given
-
-        // when
-        List<User> findUsers = userService.findUsers("hello")
-
-        // then
-
-        return null;
-    }
+//    @Test
+//    String findUsersByname() {
+//        // given
+//
+//        // when
+//        List<User> findUsers = userService.findUsers("hello");
+//
+//        // then
+//
+//        return null;
+//    }
 
     /*
         public List<User> findUsers(){
@@ -74,7 +75,7 @@ public class UserServiceintegrationTest {
         userService.deleteUser(userid);
 
         // then
-        UserDto userDto = userService.findOne(userid).orElse(null);
+        User userDto = userService.findOne(userid).orElse(null);
 
 
 

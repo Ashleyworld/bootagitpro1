@@ -2,16 +2,20 @@ package com.example.bootagit_project01.user.user.repository;
 
 import com.example.bootagit_project01.user.user.entity.User;
 import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class JpaUserRepository implements UserRepository{
 
-
+    @Autowired
     private final EntityManager em;
 
     // JPA 쓰려면 EntityManager 가 있어야한다
+    // EntityManager를 주입받는 생성자
     public JpaUserRepository(EntityManager em) {
         this.em = em;
     }

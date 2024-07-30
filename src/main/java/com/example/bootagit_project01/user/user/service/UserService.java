@@ -5,6 +5,7 @@ import com.example.bootagit_project01.user.user.entity.User;
 import com.example.bootagit_project01.user.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final ModelMapper modelMapper;
 
 
@@ -78,6 +81,11 @@ public class UserService {
     public Optional<User> findOne(Long userId) {
         return userRepository.findById(userId);
     }
+
+    public Optional<User> findUserName(String username) {
+        return userRepository.findByName(username);
+    }
+
 
     // 회원 삭제
     public void deleteUser(Long userid) {
