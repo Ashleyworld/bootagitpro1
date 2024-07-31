@@ -9,13 +9,16 @@ package com.example.bootagit_project01.user.user.controller;
 * */
 
 import com.example.bootagit_project01.user.user.dto.UserDto;
+import com.example.bootagit_project01.user.user.entity.User;
 import com.example.bootagit_project01.user.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
@@ -40,10 +43,11 @@ public class UserController {
     }
 
 
-    @GetMapping("/new")
-    public String createUser()
-    {
-        return "user";
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getUser(@PathVariable Long userid) {
+        UserDto userDto = userService.findUserId(Long.valueOf(userid))
+                .orElseThrow(() -> new NoSuchElementException("User with ID not found"));
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/new")

@@ -38,12 +38,11 @@ public class UserService {
 
 
     public UserDto joinUser(UserDto userDto) {
-        // UserDto를 User 객체로 변환
-        User user = User.builder()
-                .username(userDto.getUsername())
-                .password(userDto.getPassword())
-                .email(userDto.getEmail())
-        .build();
+        // UserDto를 User 엔티티로 변환
+        User user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setPassword(userDto.getPassword());
+        user.setEmail(userDto.getEmail());
 
         // 중복 회원 검증
         validateDuplicateUser(user);
@@ -51,18 +50,13 @@ public class UserService {
         // 사용자 저장
         User savedUser = userRepository.save(user);
 
-        // 저장된 사용자 정보를 UserDto로 직접 설정
-        userDto.setUserid(savedUser.getUserid());
-        userDto.setUsername(savedUser.getUsername());
-        userDto.setPassword(savedUser.getPassword());
-        userDto.setEmail(savedUser.getEmail());
+        // 저장된 사용자 정보를 UserDto로 반환
         return UserDto.builder()
                 .userid(savedUser.getUserid())
                 .username(savedUser.getUsername())
                 .password(savedUser.getPassword())
                 .email(savedUser.getEmail())
                 .build();
-
     }
 
 
@@ -73,34 +67,16 @@ public class UserService {
                 });
     }
 
-    /*전체 회원 조회*/
-    public List<User> findUsers() {
-        return userRepository.findAll();
-    }
-
-    public Optional<User> findOne(Long userId) {
-        return userRepository.findById(userId);
-    }
-
-    public Optional<User> findUserName(String username) {
-        return userRepository.findByName(username);
-    }
-
-
-    // 회원 삭제
-    public void deleteUser(Long userid) {
-        User user = userRepository.findById(userid)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디가 없습니다."));
-
-        userRepository.deleteById(user);
-    }
-
 
     public List<UserDto> getAllUser() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
+        return userRepository.findAll().stream()
                 .map(user -> modelMapper.map(user, UserDto.class))
                 .collect(Collectors.toList());
+    }
+
+    public Optional<UserDto> findUserId(Long userId) {
+        return userRepository.findById(userId)
+                .map(user -> modelMapper.map(user, UserDto.class));
     }
 
     public UserDto updateUser(Long userid, UserDto userDto) {
@@ -111,5 +87,12 @@ public class UserService {
 
         User updatedUser = userRepository.save(existingUser);
         return modelMapper.map(updatedUser, UserDto.class);
+    }
+
+    public void deleteUser(Long userid) {
+        User deleteduser = userRepository.findById(userid)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 아이디가 없습니다."));
+
+        userRepository.deleteByUserid(userid);
     }
 }

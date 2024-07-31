@@ -1,7 +1,6 @@
 package com.example.bootagit_project01.user.service;
 
 import com.example.bootagit_project01.user.user.entity.User;
-import com.example.bootagit_project01.user.user.repository.MemoryUserRepository;
 import com.example.bootagit_project01.user.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

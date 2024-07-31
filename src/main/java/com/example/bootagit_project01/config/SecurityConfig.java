@@ -31,8 +31,11 @@ public class SecurityConfig {
         encFilter.setForceEncoding(true);
 
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) //csrf(Cross site Request forgery) 설정을 disable 하였습니다.
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+        //  화면을 사용하기 위해 해당 옵션들을 disable 하였습니다.
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
                                 "/swagger-ui/**",
@@ -43,6 +46,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(encFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
