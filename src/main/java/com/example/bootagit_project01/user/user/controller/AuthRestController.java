@@ -1,10 +1,10 @@
-package com.example.bootagit_project01.user.admin.controller;
+package com.example.bootagit_project01.user.user.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class AdminController {
+public class AuthRestController {
 
     @GetMapping("/admin")
     public String adminP(){

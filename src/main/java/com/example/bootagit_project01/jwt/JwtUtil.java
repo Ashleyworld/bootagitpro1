@@ -3,7 +3,7 @@ package com.example.bootagit_project01.jwt;
 //JWT 관련 메소드를 제공하는 클래스
 // JWT 생성, 검증, 추출 등의 기능을 수행한다.
 
-import com.example.bootagit_project01.config.security.MyUserDetails;
+import com.example.bootagit_project01.config.security.MyUserDetail;
 import com.example.bootagit_project01.user.user.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -68,7 +68,8 @@ public class JwtUtil {
 
         // JWT Claims에 사용자 정보와 권한 저장
         Claims claims = (Claims) Jwts.claims();
-        claims.put("userid", user.getUsername());
+        claims.put("userid", user.getUserid());
+        claims.put("username", user.getUsername());
         claims.put("email", user.getEmail());
         claims.put("role", "ROLE_USER"); // TODO
 
@@ -110,7 +111,14 @@ public class JwtUtil {
         // JWT 에서 Claims를 추출
         public Claims parseClaims(String accessToken){
             try {
-                return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+                return Jwts
+                        .parserBuilder()
+                        .setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+
+                // setSigningKey : 생성하거나 디코딩하기 위해 만드려고 할 때 서명키 필요
+                // key : JWT에 디지털 서명하는데 사용되는 비밀키
+                // parseClaimsJws : 클레임 jws를 전달함
+
             } catch (ExpiredJwtException e) {
                 return e.getClaims();
             }
@@ -142,7 +150,7 @@ public class JwtUtil {
                     .collect(Collectors.toList());
 
             // Claim에 저장된 사용자 아이디를 통해 UserDetails 객체를 생성한다.
-            UserDetails principal = MyUserDetails.create((String) claims.get("memberId"), null, autorities);
+            UserDetails principal = MyUserDetail.create((String) claims.get("memberId"), null, autorities);
 
             // Authentication 객체를 생성하여 반환한다.
             return new UsernamePasswordAuthenticationToken(principal, "", autorities);

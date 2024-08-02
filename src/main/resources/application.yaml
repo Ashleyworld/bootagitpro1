@@ -1,10 +1,14 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
   datasource:
     hikari:
       driver-class-name: com.mysql.cj.jdbc.Driver
       jdbc-url: "jdbc:mysql://localhost:3306/bootagitproject1?serverTimezone=UTC&useUnicode=yes&characterEncoding=UTF-8"
       username: root
       password: 1234
+
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect

@@ -31,13 +31,11 @@ public class JwtAuthService {
             };
         }
 
-
         Claims claims = jwtUtil.parseClaims(refreshToken);
-
 
         //accessToken 생성
         String accessToken = jwtUtil.createAccessToken(User.builder()
-                .username(claims.get("userId", String.class))
+                .username(claims.get("username", String.class))
                 .build());
 
         return accessToken;

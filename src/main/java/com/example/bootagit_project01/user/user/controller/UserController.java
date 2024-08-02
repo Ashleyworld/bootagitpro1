@@ -9,11 +9,10 @@ package com.example.bootagit_project01.user.user.controller;
 * */
 
 import com.example.bootagit_project01.user.user.dto.UserDto;
-import com.example.bootagit_project01.user.user.entity.User;
 import com.example.bootagit_project01.user.user.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,15 +22,11 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@Tag(name = "User Management")
 public class UserController {
 
     @Autowired //의존관계를 주입:외부에서 주입
     private UserService userService;
-
-    @GetMapping("/")
-    public String home() {
-        return "view/home";
-    }
 
 
     @GetMapping("/userlist")
@@ -76,6 +71,8 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
 
     }
+
+
 
 
 }

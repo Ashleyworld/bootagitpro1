@@ -19,10 +19,10 @@ CREATE TABLE Task
 
 
 
-INSERT INTO user (userid, username, email, password)
-VALUES (1, 'john1', 'john@example.com', '1231'),
-       (2, 'jane2', 'jane@example.com', '1232'),
-       (3, 'doe3', 'doe@example.com', '1233');
+INSERT INTO user (username, email, password)
+VALUES ('john1', 'john@example.com', '1231'),
+       ('jane2', 'jane@example.com', '1232'),
+       ('doe3', 'doe@example.com', '1233');
 
 INSERT INTO task (title, description, status, userid)
 VALUES ('새로운 작업1', '이것은 새로운 작업에 대한 설명입니다. 1', '진행 중', 1),

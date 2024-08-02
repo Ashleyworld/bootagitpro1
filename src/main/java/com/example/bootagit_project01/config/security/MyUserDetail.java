@@ -15,16 +15,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class MyUserDetails implements UserDetails {
-    private final User user;
-    private Collection<? extends GrantedAuthority> authorities;
-    // 사용자 권한 목록을 담은 GrantedAuthority 의 컬렉션
+public class MyUserDetail implements UserDetails {
 
-    // 생성자 직접 작성, 필드 초기화
-    public MyUserDetails(User user) {
+    private User user;
+
+
+    public MyUserDetail(Long userUserid, String password, String username, String email, Long userid) {
+    }
+
+    public MyUserDetail(User user) {
         this.user = user;
         this.authorities = defaultAuthorities();
     }
+
+
+    private Collection<? extends GrantedAuthority> authorities;
+
+    public MyUserDetail(Long userid, String password, String username, String email) {
+    }
+    // 사용자 권한 목록을 담은 GrantedAuthority 의 컬렉션
+
+    // 생성자 직접 작성, 필드 초기화
 
     // 기본 권한 설정
 
@@ -45,13 +56,13 @@ public class MyUserDetails implements UserDetails {
         // User를 builder 사용해서 생성하고 MyUserDetails 객체 초기화
         // UserDetails : SprinSecurity의 인터페이스. 사용자 정보 제공 메소드 정의
 
-        MyUserDetails myUserDetails = new MyUserDetails(User.builder()
+        MyUserDetail myUserDetail = new MyUserDetail(User.builder()
                 .username(username)
                 .password(password)
                 .build());  //User Entity 빌더 호출. User 객체 생성
-        myUserDetails.authorities = authorities; // 생성된 MyUserDetails 객체의 authorites 필드를 위에서
+        myUserDetail.authorities = authorities; // 생성된 MyUserDetails 객체의 authorites 필드를 위에서
         // 메소드 인자로 받은 authorites로 설정
-        return myUserDetails;
+        return myUserDetail;
 
     }
 

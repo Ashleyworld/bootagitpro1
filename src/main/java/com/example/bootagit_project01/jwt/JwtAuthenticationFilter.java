@@ -13,10 +13,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends GenericFilterBean {
+// GenericFilterBean : 요청당 필터
+    // OncePerRequestFilter : 요청 필터당 한번씩 호출되는 클래스
+
 
     // JWT 생성 및 검증
     private JwtUtil jwtUtil = new JwtUtil("sklskljsklsjalkjklsjSKLSAKLJsklsklsjlksjsakljslkajsalksaksa",
